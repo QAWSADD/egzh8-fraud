@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f2">
+  <title>Антифрод · ЕГЖ‑8</title>
+  <link rel="stylesheet" href="/assets/site.css">
+  <script type="module" src="/assets/site.js"></script>
+</head>
+<body>
+  <header class="shell header">
+    <a class="brand" href="#top" aria-label="Антифрод">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65">
+          <path d="M12 2.6c2.2 1.9 4.9 3 8 3.5v5.1c0 4.9-3.2 8.2-8 10.3-4.8-2.1-8-5.4-8-10.3V6.1c3.1-.5 5.8-1.6 8-3.5Z" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span>Антифрод</span>
+    </a>
+    <nav aria-label="Разделы">
+      <a href="#check" data-kk="Тексеру">Проверка</a>
+      <a href="#quality" data-kk="Модель сапасы">Качество модели</a>
+    </nav>
+    <div class="languages" role="group" aria-label="Язык / Тіл">
+      <button type="button" data-language="ru" aria-label="Русский" aria-pressed="true">RU</button>
+      <button type="button" data-language="kk" aria-label="Қазақша" aria-pressed="false">ҚАЗ</button>
+    </div>
+  </header>
+  <main class="shell" id="top">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <h1 id="page-title" data-kk="Транзакцияны тексеру">Проверка транзакции</h1>
+        <p data-kk="Алаяқтық қаупін бағалау үшін мысалды таңдаңыз немесе операция деректерін енгізіңіз.">Выберите пример или введите данные операции, чтобы оценить риск мошенничества.</p>
+      </div>
+      <div class="dataset-fact">
+        <strong id="prevalence">—</strong>
+        <span data-kk="бастапқы деректегі алаяқтық үлесі">доля мошенничества в исходных данных</span>
+      </div>
+    </section>
+
+    <section class="check" id="check" aria-labelledby="examples-title">
+      <h2 id="examples-title" class="example-title" data-kk="Операция мысалдары">Примеры операций</h2>
+      <div class="examples" id="examples">
+        <button type="button" data-example="normal" aria-pressed="false" disabled data-kk="Қалыпты">Обычная</button>
+        <button type="button" data-example="borderline" aria-pressed="false" disabled data-kk="Шекаралық">На границе</button>
+        <button type="button" data-example="fraud" aria-pressed="false" disabled data-kk="Күмәнді">Подозрительная</button>
+        <button type="button" data-example="invalid" aria-pressed="false" disabled data-kk="Қате мән">С ошибкой</button>
+      </div>
+
+      <div class="check-grid">
+        <form class="panel input-panel" id="transaction-form" novalidate>
+          <h2 data-kk="Операция деректері">Данные операции</h2>
+          <div class="fields">
+            <label for="amount" data-kk="Сома">Сумма</label>
+            <input id="amount" type="number" min="0" max="100000000" step="any" inputmode="decimal" required>
+            <label for="time" data-kk="Уақыт, сек.">Время, сек.</label>
+            <input id="time" type="number" min="0" max="315360000" inputmode="numeric" required>
+            <label for="count_10m" data-kk="10 минуттағы операциялар">Операций за 10 минут</label>
+            <input id="count_10m" type="number" min="1" max="10000" inputmode="numeric" placeholder="Необязательно" data-kk-placeholder="Міндетті емес">
+          </div>
+          <button class="primary" id="predict-button" type="submit" data-kk="Операцияны тексеру">Проверить операцию</button>
+          <details class="advanced" id="advanced">
+            <summary data-kk="Қосымша деректер">Дополнительные данные</summary>
+            <p class="muted" data-kk="Уақыт деректер жиынындағы бірінші операциядан бастап секундпен есептеледі. 10 минуттық санға осы операция да кіреді.">Время отсчитывается от начала набора данных. В частоту включается текущая операция.</p>
+            <div class="fields advanced-fields">
+              <label for="seconds_since_previous" data-kk="Алдыңғы операциядан кейін, сек.">С предыдущей операции, сек.</label>
+              <input id="seconds_since_previous" type="number" min="0" max="31536000" inputmode="numeric">
+            </div>
+            <label class="checkbox-label">
+              <input id="watchlist_match" type="checkbox">
+              <span data-kk="Оқу бақылау тізімінде бар">Есть в учебном списке наблюдения</span>
+            </label>
+            <fieldset class="components">
+              <legend data-kk="V1–V28 жасырын компоненттері">Анонимные признаки V1–V28</legend>
+              <p class="muted" data-kk="Бұл мәндер оқу мысалдарымен бірге толтырылады. Модельге кемінде 21 компонент қажет.">Эти поля заполняются при выборе примера. Модели нужен минимум 21 компонент.</p>
+              <div class="component-grid" id="component-grid"></div>
+            </fieldset>
+          </details>
+        </form>
+
+        <section class="panel result-panel" id="result" aria-labelledby="result-title">
+          <h2 id="result-title" tabindex="-1" data-kk="Тексеру нәтижесі">Результат проверки</h2>
+          <div class="live" role="status">
+            <p class="decision" id="decision">Ожидает проверки</p>
+            <p class="risk-label" id="risk-label" data-kk="Модельдің тәуекел бағасы" hidden>Оценка риска модели</p>
+            <strong class="risk" id="risk" hidden></strong>
+            <div id="risk-scale" hidden>
+              <div class="rail" aria-hidden="true">
+                <span class="rail-review"></span><span class="rail-high"></span><span class="rail-marker"></span>
+              </div>
+              <div class="scale-labels"><span>0%</span><span id="threshold-label"></span><span>100%</span></div>
+            </div>
+            <p class="reason-title" id="reason-title" data-kk="Шешімнің себебі" hidden>Почему принято решение</p>
+            <p class="reason" id="reason">Выберите один из примеров или заполните форму.</p>
+          </div>
+          <details class="trace" id="trace" hidden>
+            <summary data-kk="Ережелер мен әсер еткен белгілер">Правила и вклад признаков</summary>
+            <ul id="rules"></ul>
+            <section id="features" hidden>
+              <h3 data-kk="Бағаға ең көп әсер еткен белгілер">Что повлияло на оценку</h3>
+              <p class="muted" data-kk="Әр белгі медианамен жеке алмастырылғанда тәуекел қаншаға өзгергені көрсетіледі.">Изменение оценки при замене одного признака типичным значением.</p>
+              <ul id="feature-list"></ul>
+            </section>
+            <details class="json-block">
+              <summary data-kk="API жауабы (JSON)">Ответ API (JSON)</summary>
+              <pre id="json"></pre>
+            </details>
+          </details>
+        </section>
+      </div>
+    </section>
+
+    <section class="quality" id="quality" aria-labelledby="quality-title">
+      <div class="quality-head">
+        <h2 id="quality-title" data-kk="Модель сапасы">Качество модели</h2>
+        <dl class="metrics">
+          <div><dt>Average Precision</dt><dd id="metric-ap">—</dd></div>
+          <div><dt>Recall</dt><dd id="metric-recall">—</dd></div>
+          <div><dt>Precision</dt><dd id="metric-precision">—</dd></div>
+        </dl>
+      </div>
+      <div class="charts">
+        <figure class="panel chart-panel">
+          <figcaption data-kk="Дәлдік пен толықтық қисығы">Кривая точность–полнота</figcaption>
+          <svg id="pr-curve" class="pr-curve" viewBox="0 0 600 210" role="img" aria-label="Precision–Recall"></svg>
+          <p class="muted" id="metrics-caption"></p>
+        </figure>
+        <section class="panel chart-panel" aria-labelledby="matrix-title">
+          <h3 id="matrix-title" data-kk="Қателіктер матрицасы">Матрица ошибок</h3>
+          <table class="matrix">
+            <thead><tr>
+              <th scope="col" data-kk="Нақты класс">Факт</th>
+              <th scope="col" data-kk="Дабыл жоқ">Без сигнала</th>
+              <th scope="col" data-kk="Дабыл бар">Есть сигнал</th>
+            </tr></thead>
+            <tbody>
+              <tr><th scope="row" data-kk="Қалыпты">Обычная</th><td class="correct" id="tn">—</td><td id="fp">—</td></tr>
+              <tr><th scope="row" data-kk="Алаяқтық">Мошенническая</th><td id="fn">—</td><td class="correct" id="tp">—</td></tr>
+            </tbody>
+          </table>
+          <p class="muted" data-kk="Тест жиынындағы модель нәтижесі, ережелер қолданылмай тұрып.">Результат модели на тестовой выборке до применения правил.</p>
+        </section>
+      </div>
+    </section>
+
+    <footer>
+      <p data-kk="ЕГЖ‑8 · MLG‑ULB және Worldline оқу жиыны. Төлемдер орындалмайды.">ЕГЖ‑8 · Учебный набор MLG‑ULB и Worldline. Платежи не выполняются.</p>
+      <a href="/docs" target="_blank" rel="noopener">Swagger API</a>
+    </footer>
+  </main>
+</body>
+</html>

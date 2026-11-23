@@ -1,0 +1,145 @@
+{
+  "borderline": {
+    "http_status": 200,
+    "result": {
+      "status": "review",
+      "source": "hybrid",
+      "rules": [
+        {
+          "id": "R13",
+          "group": "post",
+          "reason": "Оценка модели близка к порогу. Нужна ручная проверка.",
+          "source": "Cost-sensitive threshold on chronological validation"
+        }
+      ],
+      "probability": 0.03682492693688428,
+      "threshold": 0.036652135375509994,
+      "review_width": 0.0054978203063264985,
+      "top_features": [
+        {
+          "feature": "V4",
+          "impact": 0.03644664568464971
+        },
+        {
+          "feature": "V12",
+          "impact": 0.03454052412348051
+        },
+        {
+          "feature": "V14",
+          "impact": 0.03191982368866615
+        },
+        {
+          "feature": "V8",
+          "impact": 0.0303323423142409
+        },
+        {
+          "feature": "V2",
+          "impact": 0.015557770146566213
+        }
+      ]
+    }
+  },
+  "normal": {
+    "http_status": 200,
+    "result": {
+      "status": "clear",
+      "source": "hybrid",
+      "rules": [
+        {
+          "id": "R15",
+          "group": "post",
+          "reason": "Оценка модели ниже порога, дополнительных сигналов нет.",
+          "source": "Cost-sensitive threshold on chronological validation"
+        }
+      ],
+      "probability": 0.00015465568494846922,
+      "threshold": 0.036652135375509994,
+      "review_width": 0.0054978203063264985,
+      "top_features": [
+        {
+          "feature": "V13",
+          "impact": 4.2896658542929E-05
+        },
+        {
+          "feature": "V26",
+          "impact": 3.685017215450693E-05
+        },
+        {
+          "feature": "V7",
+          "impact": 3.316475819737154E-05
+        },
+        {
+          "feature": "V19",
+          "impact": 1.813100517811844E-05
+        },
+        {
+          "feature": "V15",
+          "impact": 4.821443876912453E-06
+        }
+      ]
+    }
+  },
+  "fraud": {
+    "http_status": 200,
+    "result": {
+      "status": "flagged",
+      "source": "hybrid",
+      "rules": [
+        {
+          "id": "R14",
+          "group": "post",
+          "reason": "Оценка модели выше порога. Операцию стоит проверить.",
+          "source": "Cost-sensitive threshold on chronological validation"
+        }
+      ],
+      "probability": 0.8974240083619328,
+      "threshold": 0.036652135375509994,
+      "review_width": 0.0054978203063264985,
+      "top_features": [
+        {
+          "feature": "V14",
+          "impact": 0.841709250034784
+        },
+        {
+          "feature": "V12",
+          "impact": 0.758704446664193
+        },
+        {
+          "feature": "V10",
+          "impact": 0.12242492006023453
+        },
+        {
+          "feature": "V11",
+          "impact": 0.06680908261899832
+        },
+        {
+          "feature": "V17",
+          "impact": 0.008589215292073016
+        }
+      ]
+    }
+  },
+  "invalid": {
+    "http_status": 422,
+    "result": {
+      "status": "invalid",
+      "source": "validation",
+      "rules": [
+        {
+          "id": "R2",
+          "group": "validation",
+          "reason": "Сумма должна быть от 0 до 100 000 000.",
+          "source": "MLG-ULB benchmark and project input schema"
+        }
+      ],
+      "probability": null,
+      "top_features": [],
+      "errors": [
+        {
+          "field": "amount",
+          "rule": "R2"
+        }
+      ]
+    }
+  }
+}
